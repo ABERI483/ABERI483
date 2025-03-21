@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #f9f9f9;
+        }
+        
+        /* Mobile Menu Styles */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+        }
+        
+        .menu-toggle span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: #333;
+            z-index: 999;
+            padding: 60px 20px 20px;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .sidebar.active {
+            right: 0;
+        }
+        
+        .close-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .sidebar-links {
+            list-style: none;
+        }
+        
+        .sidebar-links li {
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            display: block;
+            padding: 10px 5px;
+            border-bottom: 1px solid #555;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/api/placeholder/1200/600') center/cover no-repeat;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+        }
+        
+        .search-bar {
+            display: flex;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            font-size: 1rem;
+        }
+        
+        .search-bar button {
+            padding: 15px 25px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .categories {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: #333;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .category-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .category-img {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .category-card h3 {
+            padding: 15px;
+            text-align: center;
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .featured-restaurants {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 20px;
+        }
+        
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .restaurant-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .restaurant-img {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .restaurant-info {
+            padding: 20px;
+        }
+        
+        .restaurant-info h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .restaurant-info p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .rating {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .delivery-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            color: #666;
+        }
+        
+        .how-it-works {
+            background-color: #f2f2f2;
+            padding: 5rem 20px;
+        }
+        
+        .steps-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .step {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+        
+        .step h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .app-banner {
+            background-color: #4caf50;
+            color: white;
+            padding: 4rem 20px;
+            text-align: center;
+        }
+        
+        .app-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .app-text {
+            flex: 1;
+            min-width: 300px;
+            text-align: left;
+        }
+        
+        .app-text h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .app-text p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .app-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .app-btn {
+            padding: 12px 25px;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+        
+        .app-img {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        .app-img img {
+            max-width: 300px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Feedback Form Section */
+        .feedback-section {
+            background-color: #f8f8f8;
+            padding: 5rem 20px;
+        }
+        
+        .feedback-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .rating-stars {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .star-label {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #ddd;
+        }
+        
+        .star-label.active {
+            color: #ffbb00;
+        }
+        
+        .submit-btn {
+            padding: 15px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #ff5252;
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 4rem 20px 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icon {
+            background-color: #555;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        
+        .social-icon:hover {
+            background-color: #ff6b6b;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #555;
+            color: #ccc;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .step {
+                min-width: 100%;
+            }
+            
+            .app-text, .app-img {
+                text-align: center;
+                min-width: 100%;
+            }
+            
+            .app-buttons {
+                justify-content: center;
+            }
+            
+            .feedback-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="logo-icon">🍽️</span>
+                <span>QuickBite</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Restaurants</a></li>
+                <li><a href="#">How It Works</a></li>
+                <li><a href="#">Sign In</a></li>
+                <li><a href="#">Sign Up</a></li>
+            </ul>
+            <div class="menu-toggle" id="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Mobile Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="close-menu" id="close-menu">✕</button>
+        <ul class="sidebar-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Restaurants</a></li>
+            <li><a href="#">How It Works</a></li>
+            <li><a href="#">Sign In</a></li>
+            <li><a href="#">Sign Up</a></li>
+            <li><a href="#">Categories</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+    
+    <section class="hero">
+        <h1>Delicious Food, Delivered Fast</h1>
+        <p>Order from your favorite restaurants and get your food delivered right to your doorstep in minutes.</p>
+        <div class="search-bar">
+            <input type="text" placeholder="Enter your address">
+            <button>Find Food</button>
+        </div>
+    </section>
+    
+    <section class="categories">
+        <h2 class="section-title">Browse by Category</h2>
+        <div class="category-grid">
+            <div class="category-card">
+                <div class="category-img" style="background-image: url('/api/placeholder/250/180')"></div>
+                <h3>Pizza</h3>
+            </div>
+            <div class="category-card">
+                <div class="category-img" style="background-image: url('/api/placeholder/251/180')"></div>
+                <h3>Burgers</h3>
+            </div>
+            <div class="category-card">
+                <div class="category-img" style="background-image: url('/api/placeholder/252/180')"></div>
+                <h3>Sushi</h3>
+            </div>
+            <div class="category-card">
+                <div class="category-img" style="background-image: url('/api/placeholder/253/180')"></div>
+                <h3>Italian</h3>
+            </div>
+            <div class="category-card">
+                <div class="category-img" style="background-image: url('/api/placeholder/254/180')"></div>
+                <h3>Desserts</h3>
+            </div>
+            <div class="category-card">
+                <div class="category-img" style="background-image: url('/api/placeholder/255/180')"></div>
+                <h3>Healthy</h3>
+            </div>
+            <div class="category-card">
+                <div class="category-img" style="background-image: url('/api/placeholder/256/180')"></div>
+                <h3>Chinese</h3>
+            </div>
+            <div class="category-card">
+                <div class="category-img" style="background-image: url('/api/placeholder/257/180')"></div>
+                <h3>Mexican</h3>
+            </div>
+        </div>
+    </section>
+    
+    <section class="featured-restaurants">
+        <h2 class="section-title">Featured Restaurants</h2>
+        <div class="restaurant-grid">
+            <div class="restaurant-card">
+                <div class="restaurant-img" style="background-image: url('/api/placeholder/300/200')"></div>
+                <div class="restaurant-info">
+                    <h3>Pizza Palace</h3>
+                    <p>Italian, Pizza, Fast Food</p>
+                    <p class="rating">★★★★☆ 4.5</p>
+                    <div class="delivery-info">
+                        <span>$5 delivery</span>
+                        <span>25-35 min</span>
+                    </div>
+                </div>
+            </div>
+            <div class="restaurant-card">
+                <div class="restaurant-img" style="background-image: url('/api/placeholder/301/200')"></div>
+                <div class="restaurant-info">
+                    <h3>Burger Barn</h3>
+                    <p>American, Burgers, Fast Food</p>
+                    <p class="rating">★★★★★ 4.8</p>
+                    <div class="delivery-info">
+                        <span>$3 delivery</span>
+                        <span>15-25 min</span>
+                    </div>
+                </div>
+            </div>
+            <div class="restaurant-card">
+                <div class="restaurant-img" style="background-image: url('/api/placeholder/302/200')"></div>
+                <div class="restaurant-info">
+                    <h3>Sushi Sensation</h3>
+                    <p>Japanese, Sushi, Asian</p>
+                    <p class="rating">★★★★☆ 4.6</p>
+                    <div class="delivery-info">
+                        <span>$6 delivery</span>
+                        <span>30-40 min</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="how-it-works">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-container">
+            <div class="step">
+                <div class="step-icon">📍</div>
+                <h3>Set Your Location</h3>
+                <p>Enter your address to find restaurants that deliver to you.</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">🍕</div>
+                <h3>Choose a Restaurant</h3>
+                <p>Browse menus and select your favorite dishes.</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">💳</div>
+                <h3>Pay Securely</h3>
+                <p>Use your preferred payment method for a hassle-free checkout.</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">🚚</div>
+                <h3>Enjoy Your Food</h3>
+                <p>Track your order and enjoy delicious food at your doorstep.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="app-banner">
+        <div class="app-content">
+            <div class="app-text">
+                <h2>Download Our App</h2>
+                <p>Get the full QuickBite experience on your phone. Order food, track deliveries, and earn rewards - all on the go!</p>
+                <div class="app-buttons">
+                    <a href="#" class="app-btn">
+                        <span>App Store</span>
+                    </a>
+                    <a href="#" class="app-btn">
+                        <span>Google Play</span>
+                    </a>
+                </div>
+            </div>
+            <div class="app-img">
+                <img src="/api/placeholder/300/600" alt="QuickBite App">
+            </div>
+        </div>
+    </section>
+    
+    <!-- Feedback Form Section -->
+    <section class="feedback-section">
+        <h2 class="section-title">We Value Your Feedback</h2>
+        <div class="feedback-container">
+            <form class="feedback-form" id="feedback-form">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="order-id">Order ID (if applicable)</label>
+                    <input type="text" id="order-id" name="order-id">
+                </div>
+                <div class="form-group">
+                    <label for="feedback-type">Type of Feedback</label>
+                    <select id="feedback-type" name="feedback-type" required>
+                        <option value="">Select an option</option>
+                        <option value="general">General Feedback</option>
+                        <option value="restaurant">Restaurant Feedback</option>
+                        <option value="delivery">Delivery Feedback</option>
+                        <option value="app">App/Website Feedback</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Your Rating</label>
+                    <div class="rating-stars" id="rating-stars">
+                        <span class="star-label" data-rating="1">★</span>
+                        <span class="star-label" data-rating="2">★</span>
+                        <span class="star-label" data-rating="3">★</span>
+                        <span class="star-label" data-rating="4">★</span>
+                        <span class="star-label" data-rating="5">★</span>
+                    </div>
+                    <input type="hidden" id="rating" name="rating" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="message">Your Feedback</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Submit Feedback</button>
+            </form>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>QuickBite</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Investors</a></li>
+                    <li><a href="#">Press</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>For Customers</h3>
+                <ul>
+                    <li><a href="#">How it Works</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>For Restaurants</h3>
+                <ul>
+                    <li><a href="#">Partner with us</a></li>
+                    <li><a href="#">Restaurant Dashboard</a></li>
+                    <li><a href="#">Case Studies</a></li>
+                    <li><a href="#">Resources</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Contact Us</h3>
+                <ul>
+                    <li><a href="mailto:info@quickbite.com">info@quickbite.com</a></li>
+                    <li><a href="tel:+18001234567">1-800-123-4567</a></li>
+                </ul>
+                <div class="social-links">
+                    <a href="#" class="social-icon">f</a>
+                    <a href="#" class="social-icon">t</a>
+                    <a href="#" class="social-icon">in</a>
+                    <a href="#" class="social-icon">ig</a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2025 QuickBite. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Functionality
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const closeMenu = document.getElementById('close-menu');
+        const overlay = document.getElementById('overlay');
+
+        // Open menu when hamburger icon is clicked
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+        });
+
+        // Close menu when X button is clicked
+        closeMenu.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        });
+
+        // Close menu when clicking outside of it
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        });
+
+        // Star Rating Functionality
+        const stars = document.querySelectorAll('.star-label');
+        const ratingInput = document.getElementById('rating');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = this.getAttribute('data-rating');
+                ratingInput.value = rating;
+                
+                // Reset all stars
+                stars.forEach(s => s.classList.remove('active'));
+                
+                // Activate stars up to the selected one
+                stars.forEach(s => {
+                    if (s.getAttribute('data-rating') <= rating) {
+                        s.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Handle form submission
+        const feedbackForm = document.getElementById('feedback-form');
+        
+        feedbackForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // You would typically send the form data to your server here
+            const formData = new FormData(feedbackForm);
+            const formValues = Object.fromEntries(formData.entries());
+            
+            // For demo purposes, we'll just show an alert
+            alert('Thank you for your feedback! We appreciate your input.');
+            feedbackForm.reset();
+            
+            // Reset star rating display
+            stars.forEach(s => s.classList.remove('active'));
+            ratingInput.value = 0;
+        });
+    </script>
+</body>
+</html>
